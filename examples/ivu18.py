@@ -82,5 +82,5 @@ plt.plot(X, I1Y, label='I1Y')
 plt.axhline(+50, linestyle='--', color='tab:cyan', label=f'$\\pm$ 50 Gcm')
 plt.axhline(-50, linestyle='--', color='tab:cyan')
 plt.legend()
-plt.show()
+if show: plt.show()
 
