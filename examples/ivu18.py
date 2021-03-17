@@ -10,6 +10,9 @@ show=False
 PERIOD = 18
 NHALFPERIODS = 11
 
+# Conversion factors
+TMM2GCM = 1e3
+
 undulator = ri.get_ivu(
     gap=4.63,
     period=PERIOD,
