@@ -22,9 +22,9 @@ undulator = ri.get_ivu(
     #pole_body_divisions = [3, 3, 3],
     #pole_tip_divisions = [5, [5, 1/6], 5],
     #magnet_divisions = [3, 3, 3],
-    pole_body_divisions = [2, 2, 2],
-    pole_tip_divisions = [2, 2, 2],
-    magnet_divisions = [2, 2, 2],
+    pole_body_divisions = [3, 3, 3],
+    pole_tip_divisions = [3, 3, 3],
+    magnet_divisions = [3, 3, 3],
 )
 
 tstart = time.time()
