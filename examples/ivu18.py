@@ -4,6 +4,7 @@ import radiamodels.util as ru
 
 import numpy as np
 import matplotlib.pyplot as plt
+import time
 
 show=False
 
@@ -17,10 +18,18 @@ undulator = ri.get_ivu(
     gap=4.63,
     period=PERIOD,
     nhalfperiods=NHALFPERIODS,
+
+    #pole_body_divisions = [3, 3, 3],
+    #pole_tip_divisions = [5, [5, 1/6], 5],
+    #magnet_divisions = [3, 3, 3],
+    pole_body_divisions = [2, 2, 2],
+    pole_tip_divisions = [2, 2, 2],
+    magnet_divisions = [2, 2, 2],
 )
 
+tstart = time.time()
 rad.Solve(undulator, 0.0003, 1000)
-
+print('solve time', round(time.time() - tstart, 3), '(s)')
 
 
 # Full undulator
