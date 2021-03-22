@@ -1,81 +1,101 @@
 import radia as rad
+import matplotlib.pyplot as plt
+import numpy as np
 
-
+# Parameters to change
 gap = 10
-size = [30, 20, 500]
-strength = [0, 1, 0]
-divisions = [10, 10, 10]
-material = rad.MatLin([0.05, 0.15], [0, 1.3, 0])
-color = [0, 0, 1]
+space = 20
+magnet_size = [30, 20, 100]
+iron_top_height = 30
+iron_side_width = 40
+divisions = [5, 5, 5]
 
-center_top = [0, +size[1]/2 + gap/2, 0]
-center_bot = [0, -size[1]/2 - gap/2, 0]
+strength = [0, 0, 0]
 
+# Magnet and iron properties
+magnet_material = rad.MatLin([0.05, 0.15], [0, 1.3, 0])
+magnet_color = [0, 0, 1]
+iron_material = rad.MatStd('Xc06')
+iron_color = [0, 1, 0]
+
+
+magnet_center = [0, magnet_size[1] / 2 + gap / 2, 0]
+iron_top_size = [magnet_size[0] + space, iron_top_height, magnet_size[2]]
+iron_halfside_size = [iron_side_width, magnet_size[1] + gap / 2 + iron_top_size[1], magnet_size[2]]
+iron_top_center = [+(magnet_size[0] - iron_top_size[0])/2, magnet_size[1] + gap/2 + iron_top_size[1]/2, 0]
+iron_halfside_center = [-(magnet_size[0]/2 + space + iron_halfside_size[0]/2), iron_halfside_size[1]/2, 0]
+
+
+dipole = rad.ObjCnt([])
 
 magnet_top = rad.ObjFullMag(
-    center_top,
-    size,
+    magnet_center,
+    magnet_size,
     strength,
     divisions,
-    0, #module do later
-    material,
-    color
+    dipole, #module do later
+    magnet_material,
+    magnet_color
 )
 
-magnet_bot = rad.ObjFullMag(
-    center_bot,
-    size,
+
+iron_top = rad.ObjFullMag(
+    iron_top_center,
+    iron_top_size,
     strength,
     divisions,
-    0, #module do later
-    material,
-    color
+    dipole, #module do later
+    iron_material,
+    iron_color
 )
 
-space = 20
-block_material = rad.MatStd('Xc06')
-block_size = [40, size[1]*2+gap, size[2]]
-block_center = [-size[0]/2-block_size[0]/2 - space, 0, 0]
-block_color = [0, 1, 0]
-block_strength = [0, 0, 0]
-block_divisions = [10, 10, 10]
-
-block_side = rad.ObjFullMag(
-    block_center,
-    block_size,
-    block_strength,
-    block_divisions,
-    0, #module do later
-    block_material,
-    block_color
+iron_halfside = rad.ObjFullMag(
+    iron_halfside_center,
+    iron_halfside_size,
+    strength,
+    divisions,
+    dipole, #module do later
+    iron_material,
+    iron_color
 )
+rad.TrfZerPara(dipole, [0,0,0], [0,1,0])
 
-top_size = [size[0]+block_size[0]+space, 30, size[2]]
-top_center = [(-block_size[0]-space)/2, size[1]+gap/2+top_size[1]/2, 0]
-bot_center = [(-block_size[0]-space)/2, -size[1]-gap/2-top_size[1]/2, 0]
 
-block_top = rad.ObjFullMag(
-    top_center,
-    top_size,
-    block_strength,
-    block_divisions,
-    0, #module do later
-    block_material,
-    block_color
-)
-
-block_bot = rad.ObjFullMag(
-    bot_center,
-    top_size,
-    block_strength,
-    block_divisions,
-    0, #module do later
-    block_material,
-    block_color
-)
-
-dipole = rad.ObjCnt([magnet_top, magnet_bot, block_side, block_top, block_bot])
-# rad.Solve(dipole, 0.0003, 1000)
 rad.Solve(dipole, 0.0003, 1000)
 
 print('field at center', rad.Fld(dipole, 'b', [0, 0, 0]), '(T)')
+
+
+# Make some plots
+
+zstart = -magnet_size[2]
+zstop = -zstart
+Z = np.linspace(zstart, zstop, 1501)
+B1 = rad.FldLst(dipole, 'b', [0, 0, zstart], [0, 0, zstop], len(Z), 'noarg')
+
+plt.figure()
+plt.title('Dipole field along Z')
+plt.xlabel('Z Position (mm)')
+plt.ylabel('Field (T)')
+plt.plot(Z, [b[0] for b in B1], label='$B_x$')
+plt.plot(Z, [b[1] for b in B1], label='$B_y$')
+plt.plot(Z, [b[2] for b in B1], label='$B_z$')
+plt.legend()
+plt.show()
+
+
+
+xstart = 0
+xstop = 2 * magnet_size[0]
+X = np.linspace(xstart, xstop, 1501)
+B2 = rad.FldLst(dipole, 'b', [xstart, 0, 0], [xstop, 0, 0], len(X), 'noarg')
+
+plt.figure()
+plt.title('Dipole field along X')
+plt.xlabel('X Position (mm)')
+plt.ylabel('Field (T)')
+plt.plot(X, [b[0] for b in B2], label='$B_x$')
+plt.plot(X, [b[1] for b in B2], label='$B_y$')
+plt.plot(X, [b[2] for b in B2], label='$B_z$')
+plt.legend()
+plt.show()
