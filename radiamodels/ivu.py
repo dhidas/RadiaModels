@@ -274,19 +274,22 @@ def get_ivu (
     if returnobject == 6:
         return girder_top
 
-    # Roll for top and bottom girder
-    if girder_top_roll_rad != 0:
-        print('rolling top girder')
-        rad.TrfOrnt(girder_top, rad.TrfRot([0, 0, 0], [0, 0, 1], girder_top_roll_rad))
 
     # Best is if this is symmetric
     if girder_top_roll_rad == -girder_bot_roll_rad and tilt == 0:
         print('fast symmetric')
+
+        # Roll for top and bottom girder
+        if girder_top_roll_rad != 0:
+            rad.TrfOrnt(girder_top, rad.TrfRot([0, 0, 0], [0, 0, 1], girder_top_roll_rad))
+
+        # Taper
         if taper != 0:
             taper_mm_per_mm = taper / length
             phi_taper = np.arcsin(taper_mm_per_mm/2)
             rad.TrfOrnt(girder_top, rad.TrfRot([0, 0, 0], [-1, 0, 0], phi_taper))
 
+        # Do the gap shift and mirror symmetry
         rad.TrfOrnt(girder_top, rad.TrfTrsl([0, +gap/2, 0]))
         rad.TrfZerPara(girder_top, [0,0,0], [0,1,0])
         return girder_top
@@ -302,7 +305,9 @@ def get_ivu (
     rad.TrfOrnt(girder_bot, rad.TrfPlSym([0, 0, 0], [0, 1, 0]))
     rad.TrfOrnt(girder_bot, rad.TrfInv())
 
-    # Bottom girder roll
+    # Top and Bottom girder roll
+    if girder_top_roll_rad != 0:
+        rad.TrfOrnt(girder_top, rad.TrfRot([0, 0, 0], [0, 0, 1], girder_top_roll_rad))
     if girder_bot_roll_rad != 0:
         rad.TrfOrnt(girder_bot, rad.TrfRot([0, 0, 0], [0, 0, 1], girder_bot_roll_rad))
 
