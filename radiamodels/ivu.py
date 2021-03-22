@@ -83,16 +83,24 @@ def get_halfpole (
     pole = rad.ObjCutMag(pole,  [0, 0, center_z + size[2]/2 - chamfer_longedge], [0, -1, +1])[0]
     pole = rad.ObjCutMag(pole,  [0, 0, center_z - size[2]/2 + chamfer_longedge], [0, -1, -1])[0]
 
-    # Cut pole with a plane in +y.  negative side is the tip
-    pole_body, pole_tip  = rad.ObjCutMag(pole,  [0, tip_height, 0], [0, -1, 0])
+    # If there is a pole tip height defined use it, otherwise just one block
+    if tip_height > 0:
+        # Cut pole with a plane in +y.  negative side is the tip
+        pole_body, pole_tip  = rad.ObjCutMag(pole,  [0, tip_height, 0], [0, -1, 0])
 
-    # Body and tip divisions
-    rad.ObjDivMag(pole_body, body_divisions)
-    rad.ObjDivMag(pole_tip, tip_divisions)
+        # Body and tip divisions
+        rad.ObjDivMag(pole_body, body_divisions)
+        rad.ObjDivMag(pole_tip, tip_divisions)
+
+        if module != 0:
+            rad.ObjAddToCnt(module, [pole_body, pole_tip])
+        else:
+            return rad.ObjCnt([pole_body, pole_tip])
 
     if module != 0:
-        rad.ObjAddToCnt(module, [pole_body, pole_tip])
-    return rad.ObjCnt([pole_body, pole_tip])
+        rad.ObjAddToCnt(module, [pole])
+
+    return rad.ObjCnt([pole])
 
 
 
@@ -277,7 +285,7 @@ def get_ivu (
 
     # Best is if this is symmetric
     if girder_top_roll_rad == -girder_bot_roll_rad and tilt == 0:
-        print('fast symmetric')
+        if debug: print('fast symmetric')
 
         # Roll for top and bottom girder
         if girder_top_roll_rad != 0:
@@ -296,7 +304,7 @@ def get_ivu (
 
 
     # CAREFUL: below here will take longer
-    print('Nonsymmetric and will take longer to compute')
+    if debug: print('Nonsymmetric and will take longer to compute')
 
 
    

@@ -7,6 +7,10 @@ import matplotlib.pyplot as plt
 import time
 
 show=False
+if not show:
+    import matplotlib
+    matplotlib.use('Agg')
+
 
 PERIOD = 18
 NHALFPERIODS = 11
@@ -19,15 +23,9 @@ undulator = ri.get_ivu(
     period=PERIOD,
     nhalfperiods=NHALFPERIODS,
 
-    #pole_body_divisions = [3, 3, 3],
-    #pole_tip_divisions = [5, [5, 1/6], 5],
-    #magnet_divisions = [3, 3, 3],
-    pole_body_divisions = [1, 1, 1],
-    pole_tip_divisions = [1, 1, 1],
-    magnet_divisions = [1, 1, 1],
-    girder_top_roll_rad = 0.1*np.pi,
-    girder_bot_roll_rad = -0.1*np.pi,
-
+    pole_body_divisions = [3, 3, 3],
+    pole_tip_divisions = [5, [5, 1/6], 5],
+    magnet_divisions = [3, 3, 3],
 )
 
 tstart = time.time()
