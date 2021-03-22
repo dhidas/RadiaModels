@@ -77,30 +77,31 @@ rad.TrfOrnt(girder_tu, rad.TrfPlSym([0, 0, 0], [0, 0, 1]))
 rad.TrfOrnt(girder_tu, rad.TrfInv())
 
 
-girder_top = rad.ObjCnt([girder_tu, girder_td])
+# undulator is the top girder, adjusted for gap, and reflected symmetry
+undulator = rad.ObjCnt([girder_tu, girder_td])
+rad.TrfOrnt(undulator, rad.TrfTrsl([0, +gap/2, 0]))
+rad.TrfZerPara(undulator, [0,0,0], [0,1,0])
 
-
-girder_bot = rad.ObjDpl(girder_top)
-rad.TrfOrnt(girder_bot, rad.TrfPlSym([0, 0, 0], [0, 1, 0]))
-rad.TrfOrnt(girder_bot, rad.TrfInv())
-
-
-# Adjust for gap
-rad.TrfOrnt(girder_top, rad.TrfTrsl([0, +gap/2, 0]))
-rad.TrfOrnt(girder_bot, rad.TrfTrsl([0, -gap/2, 0]))
-
-# Construct undulator
-undulator = rad.ObjCnt([girder_top, girder_bot])
-
+# Solve and print solved time
 tstart = time.time()
 rad.Solve(undulator, 0.0003, 1000)
 print('solve time', round(time.time() - tstart, 3), '(s)')
-exit(0)
 
-Z = np.linspace(-1.3*period*nperiods/2, 1.3*period*nperiods/2, 501)
+
+
+# Plot the field along z
+zstart = -1.3*period*nperiods/2
+zstop = -zstart
+Z = np.linspace(zstart, zstop, 501)
 B = [rad.Fld(undulator, 'b', [0, 0, z]) for z in Z]
 
 plt.figure()
-plt.plot(Z, [b[1] for b in B])
+plt.title('Untulator field along Z')
+plt.xlabel('Z Position (mm)')
+plt.ylabel('Field (T)')
+plt.plot(Z, [b[0] for b in B], label='$B_x$')
+plt.plot(Z, [b[1] for b in B], label='$B_y$')
+plt.plot(Z, [b[2] for b in B], label='$B_z$')
+plt.legend()
 plt.savefig('hybrid_blocks.png')
-#plt.show()
+plt.show()
