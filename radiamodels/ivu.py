@@ -1,5 +1,6 @@
 import radia as rad
 import radiamodels.util as ru
+import numpy as np
 
 def get_quartermagnet (
     size,
@@ -98,8 +99,8 @@ def get_halfpole (
 
 def get_ivu (
     gap = 5,
-    taper = None,
-    tilt = None,
+    taper = 0,
+    tilt = 0,
     period = 18,
     nhalfperiods = 2,
     
@@ -125,8 +126,8 @@ def get_ivu (
     end2_pole_height = 6,
     end2_magnet_height = 9,
 
-    girder_top_roll_rad = None,
-    girder_bot_roll_rad = None,
+    girder_top_roll_rad = 0,
+    girder_bot_roll_rad = 0,
     returnobject = 0,
     debug = False,
 ):
@@ -272,28 +273,48 @@ def get_ivu (
     girder_top = rad.ObjCnt([girder_to, girder_ti])
     if returnobject == 6:
         return girder_top
+
+    # Roll for top and bottom girder
+    if girder_top_roll_rad != 0:
+        print('rolling top girder')
+        rad.TrfOrnt(girder_top, rad.TrfRot([0, 0, 0], [0, 0, 1], girder_top_roll_rad))
+
+    # Best is if this is symmetric
+    if girder_top_roll_rad == -girder_bot_roll_rad and tilt == 0:
+        print('fast symmetric')
+        if taper != 0:
+            taper_mm_per_mm = taper / length
+            phi_taper = np.arcsin(taper_mm_per_mm/2)
+            rad.TrfOrnt(girder_top, rad.TrfRot([0, 0, 0], [-1, 0, 0], phi_taper))
+
+        rad.TrfOrnt(girder_top, rad.TrfTrsl([0, +gap/2, 0]))
+        rad.TrfZerPara(girder_top, [0,0,0], [0,1,0])
+        return girder_top
+
+
+    # CAREFUL: below here will take longer
+    print('Nonsymmetric and will take longer to compute')
+
+
    
     # Bottom girder
     girder_bot = rad.ObjDpl(girder_top)
     rad.TrfOrnt(girder_bot, rad.TrfPlSym([0, 0, 0], [0, 1, 0]))
     rad.TrfOrnt(girder_bot, rad.TrfInv())
 
-    # Roll for top and bottom girder
-    if girder_top_roll_rad is not None:
-        rad.TrfOrnt(girder_top, rad.TrfRot([0, 0, 0], [0, 0, 1], girder_top_roll_rad))
-    if girder_bot_roll_rad is not None:
+    # Bottom girder roll
+    if girder_bot_roll_rad != 0:
         rad.TrfOrnt(girder_bot, rad.TrfRot([0, 0, 0], [0, 0, 1], girder_bot_roll_rad))
 
 
     # for taper
-    if taper is not None:
+    if taper != 0:
         taper_mm_per_mm = taper / length
         phi_taper = np.arcsin(taper_mm_per_mm/2)
         rad.TrfOrnt(girder_top, rad.TrfRot([0, 0, 0], [-1, 0, 0], phi_taper))
         rad.TrfOrnt(girder_bot, rad.TrfRot([0, 0, 0], [+1, 0, 0], phi_taper))
 
 
-    # Adjust for taper
 
     # Adjust for gap
     rad.TrfOrnt(girder_top, rad.TrfTrsl([0, +gap/2, 0]))

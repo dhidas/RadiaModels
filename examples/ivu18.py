@@ -22,9 +22,12 @@ undulator = ri.get_ivu(
     #pole_body_divisions = [3, 3, 3],
     #pole_tip_divisions = [5, [5, 1/6], 5],
     #magnet_divisions = [3, 3, 3],
-    pole_body_divisions = [4, 4, 4],
-    pole_tip_divisions = [4, 4, 4],
-    magnet_divisions = [4, 4, 4],
+    pole_body_divisions = [1, 1, 1],
+    pole_tip_divisions = [1, 1, 1],
+    magnet_divisions = [1, 1, 1],
+    girder_top_roll_rad = 0.1*np.pi,
+    girder_bot_roll_rad = -0.1*np.pi,
+
 )
 
 tstart = time.time()
@@ -63,7 +66,7 @@ B2P = [rad.Fld(undulator, 'b', [0, 0, z]) for z in Z2P]
 ByEffMag = ru.get_beff(Z2P, [b[1] for b in B2P], 2)
 ByEff = [-ByEffMag*np.sin(2*np.pi/PERIOD * z + 2*np.pi*(NHALFPERIODS%4/4)) for z in Z2P]
 plt.figure()
-plt.title(f'Undulator Magnetic Field')
+plt.title(f'Undulator Effective Field')
 plt.xlabel('Z (mm)')
 plt.ylabel('Magnetic Field (T)')
 plt.plot(Z2P, [b[0] for b in B2P], label='Bx')
