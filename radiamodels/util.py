@@ -26,11 +26,14 @@ def get_beff (Z, By, nperiods, debug=False):
     beff = np.sqrt(beff)
     return beff
 
+def b2k_mm (b, period):
+    """Convert magnetic field to K where period is in mm"""
+    return 0.09336*b*period
 
-def get_magnetic_material_permendur (rad=rad):
-    return get_magnetic_material(rad=rad, filename=resource_stream (__name__,'data/PermendurNEOMAX.txt'))
+def get_magnetic_material_permendur ():
+    return get_magnetic_material(filename=resource_stream (__name__,'data/PermendurNEOMAX.txt'))
 
-def get_magnetic_material (filename, rad=rad):
+def get_magnetic_material (filename):
     '''
     Get magnetic material defined by bh curve in file
     '''

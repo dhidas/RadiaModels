@@ -13,7 +13,7 @@ def get_quartermagnet (
     center_z=0,
     color=[0, 0, 1],
     module=0,
-    strength=[0, 0, 1]
+    strength=[0, 0, 1],
 ):
     # This gives a magnet in the +x, +y quadrent meant to be a quarter magnet
     
@@ -137,6 +137,7 @@ def get_ivu (
     girder_top_roll_rad = 0,
     girder_bot_roll_rad = 0,
     returnobject = 0,
+
     debug = False,
 ):
     # build the IVU
