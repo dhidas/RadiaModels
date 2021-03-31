@@ -10,11 +10,12 @@ ivu18args = dict({
 
     'half_pole_size': [38/2, 21.5, 2.8],
     'pole_material': ru.get_magnetic_material_permendur(),
-    'pole_body_divisions': [4, [5, 5], 4],
+    'pole_body_divisions': [6, [5, 5], 4],
     'pole_tip_divisions': [5, [5, 6], 5],
     'pole_chamfer_shortedge': 3,
     'pole_chamfer_longedge': 0.05,
     'pole_tip_height': 5,
+    'pole_offset_y': 0,
 
     'quartermagnet_size_xy': [58/2, 30],
     'magnet_material': rad.MatLin([0.05, 0.15], [0, 0, 1.30]),
@@ -23,6 +24,7 @@ ivu18args = dict({
     'magnet_chamfer_outerside': 0,
     'magnet_chamfer_gapside': 0,
     'magnet_chamfer_farside': 0,
+    'magnet_offset_y': 0,
     'air_gap': 0.05,
 
     'end1_pole_height': 15,

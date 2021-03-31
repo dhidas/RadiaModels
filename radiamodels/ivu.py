@@ -11,6 +11,7 @@ def get_quartermagnet (
     chamfer_gapside=0,
     chamfer_farside=0,
     center_z=0,
+    offset_y=0,
     color=[0, 0, 1],
     module=0,
     strength=[0, 0, 1],
@@ -45,6 +46,9 @@ def get_quartermagnet (
     magnet = rad.ObjCutMag(magnet,  [0, size[1], center_z + size[2]/2 - chamfer_farside], [0, +1, +1])[0]
     magnet = rad.ObjCutMag(magnet,  [0, size[1], center_z - size[2]/2 + chamfer_farside], [0, +1, -1])[0]
 
+    # Shift magnet for offset_y
+    rad.TrfOrnt(magnet, rad.TrfTrsl([0, offset_y, 0]))
+
     return magnet
 
 def get_halfpole (
@@ -56,6 +60,7 @@ def get_halfpole (
     chamfer_longedge=0,
     tip_height=1,
     center_z=0,
+    offset_y=0,
     pole_color=[1, 0, 0],
     tip_color=[0, 1, 0],
     module = 0,
@@ -92,13 +97,20 @@ def get_halfpole (
         rad.ObjDivMag(pole_body, body_divisions)
         rad.ObjDivMag(pole_tip, tip_divisions)
 
+        # Shift for offset_y
+        rad.TrfOrnt(pole_body, rad.TrfTrsl([0, offset_y, 0]))
+        rad.TrfOrnt(pole_tip,  rad.TrfTrsl([0, offset_y, 0]))
+
         if module != 0:
-            rad.ObjAddToCnt(module, [pole_body, pole_tip])
+            return rad.ObjAddToCnt(module, [pole_body, pole_tip])
         else:
             return rad.ObjCnt([pole_body, pole_tip])
 
+    # Shift for offset_y
+    rad.TrfOrnt(pole, rad.TrfTrsl([0, offset_y, 0]))
+
     if module != 0:
-        rad.ObjAddToCnt(module, [pole])
+        return rad.ObjAddToCnt(module, [pole])
 
     return rad.ObjCnt([pole])
 
@@ -119,6 +131,7 @@ def get_ivu (
     pole_chamfer_shortedge = 2,
     pole_chamfer_longedge = 1,
     pole_tip_height = 2,
+    pole_offset_y = 0,
     
     quartermagnet_size_xy = [58/2, 30],
     magnet_material = rad.MatLin([0.05, 0.15], [0, 0, 1.30]),
@@ -127,6 +140,7 @@ def get_ivu (
     magnet_chamfer_outerside = 0,
     magnet_chamfer_gapside = 0,
     magnet_chamfer_farside = 0,
+    magnet_offset_y = 0,
     air_gap = 0.05,
 
     end1_pole_height = 15,
@@ -157,6 +171,7 @@ def get_ivu (
         chamfer_shortedge=pole_chamfer_shortedge,
         chamfer_longedge=pole_chamfer_longedge,
         tip_height=pole_tip_height,
+        offset_y=pole_offset_y,
     )
     quartermagnet_plusz = get_quartermagnet(
         size=quartermagnet_size,
@@ -167,7 +182,8 @@ def get_ivu (
         chamfer_gapside=magnet_chamfer_gapside,
         chamfer_farside=magnet_chamfer_farside,
         center_z=half_pole_size[2]/2 + quartermagnet_size[2]/2 + air_gap,
-    )   
+        offset_y=magnet_offset_y,
+    )
     quartermagnet_minusz = rad.ObjDpl(quartermagnet_plusz)
     rad.TrfOrnt(quartermagnet_minusz, rad.TrfPlSym([0, 0, 0], [0, 0, 1]))
     if debug: print('calc half period', half_pole_size[2] + quartermagnet_size[2]*2 + air_gap*2)
@@ -206,6 +222,7 @@ def get_ivu (
         chamfer_shortedge=pole_chamfer_shortedge,
         chamfer_longedge=pole_chamfer_longedge,
         tip_height=pole_tip_height,
+        offset_y=pole_offset_y,
     )
     end1_quartermagnet_size = [quartermagnet_size[0], end1_magnet_height, quartermagnet_size[2]]
     end1_quartermagnet_plusz = get_quartermagnet(
@@ -217,6 +234,7 @@ def get_ivu (
         chamfer_gapside=magnet_chamfer_gapside,
         chamfer_farside=magnet_chamfer_farside,
         center_z=half_pole_size[2]/2 + quartermagnet_size[2]/2 + air_gap,
+        offset_y=magnet_offset_y,
     )   
     end1_quartermagnet_minusz = rad.ObjDpl(end1_quartermagnet_plusz)
     rad.TrfOrnt(end1_quartermagnet_minusz, rad.TrfPlSym([0, 0, 0], [0, 0, 1]))
@@ -239,6 +257,7 @@ def get_ivu (
         chamfer_shortedge=pole_chamfer_shortedge,
         chamfer_longedge=pole_chamfer_longedge,
         tip_height=pole_tip_height,
+        offset_y=pole_offset_y,
     )
     end2_quartermagnet_size = [quartermagnet_size[0], end2_magnet_height, quartermagnet_size[2]]
     end2_quartermagnet_plusz = get_quartermagnet(
@@ -250,6 +269,7 @@ def get_ivu (
         chamfer_gapside=magnet_chamfer_gapside,
         chamfer_farside=magnet_chamfer_farside,
         center_z=half_pole_size[2]/2 + quartermagnet_size[2]/2 + air_gap,
+        offset_y=magnet_offset_y,
     )   
     end2_quartermagnet_minusz = rad.ObjDpl(end2_quartermagnet_plusz)
     rad.TrfOrnt(end2_quartermagnet_minusz, rad.TrfPlSym([0, 0, 0], [0, 0, 1]))

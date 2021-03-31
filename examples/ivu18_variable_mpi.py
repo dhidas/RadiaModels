@@ -12,7 +12,7 @@ import os.path
 #Initialize MPI
 rank = rad.UtiMPI('on')
 
-show=False
+show=True
 if not show:
     import matplotlib
     matplotlib.use('Agg')
@@ -30,11 +30,18 @@ value = [38/2, 21.5, 2.8]
 # Change default arguments here
 ivu18args.update({
 #    'gap': 5.00,
-#    'pole_body_divisions' : [3, 3, 3],
-#    'pole_tip_divisions' : [3, 3, 3],
-#    'magnet_divisions' : [3, 3, 3],
+#    'pole_body_divisions' : [1, 1, 1],
+#    'pole_tip_divisions' : [1, 1, 1],
+#    'magnet_divisions' : [1, 1, 1],
     })
-
+ivu18args.update({
+    'half_pole_size': [20.0, 22.173913043478258, 2.9130434782608696],
+    'pole_chamfer_shortedge': 6.5,
+    'pole_chamfer_longedge': 0,
+    'magnet_chamfer_gapside': 0,
+    'quartermagnet_size_xy': [30, 35],
+    'pole_offset_y': 0,
+    })
 
 undulator = ri.get_ivu(**ivu18args)
 

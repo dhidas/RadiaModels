@@ -30,27 +30,66 @@ TMM2GCM = 1e3
 # default is just variable name unless name added/defined
 name = None
 
+
+ivu18args.update({
+    'half_pole_size': [20.0, 22.173913043478258, 2.9130434782608696],
+    'pole_chamfer_shortedge': 6.5,
+    'pole_chamfer_longedge': 0,
+    'magnet_chamfer_gapside': 0,
+    'quartermagnet_size_xy': [30, 35],
+    })
+
+# pole size
+#variable = 'half_pole_size'
 # pole height
-variable = 'half_pole_size'
-name = variable + '_y'
-values = np.linspace(15, 50, size)
-value = [ivu18args[variable][0], values[rank], ivu18args[variable][2]]
+#name = variable + '_y'
+#values = np.linspace(10, ivu18args['quartermagnet_size_xy'][1], size)
+#value = [ivu18args[variable][0], values[rank], ivu18args[variable][2]]
+# pole width
+#name = variable + '_x'
+#values = np.linspace(10, ivu18args['quartermagnet_size_xy'][0], size)
+#value = [values[rank], ivu18args[variable][1], ivu18args[variable][2]]
 
 #variable = 'pole_chamfer_shortedge'
-#values = np.linspace(0.1, 9.4, size)
+#values = np.linspace(0, 10, size)
 #value = values[rank]
 
 #variable = 'pole_chamfer_longedge'
-#values = np.linspace(0, 1.3, size)
+#values = np.linspace(0, ivu18args['half_pole_size'][2]/2, size)
 #value = values[rank]
 
 #variable = 'half_pole_size'
-#values = np.linspace(10, 50, size)
-#value = [38/2, values[rank], 2.8]
+#name = variable + '_z'
+#values = np.linspace(1, 5, size)
+#value = [ivu18args[variable][0], ivu18args[variable][1], values[rank]]
 
-#variable = 'magnet_divisions'
-#values = np.linspace(1, 6, size)
-#value = [rank+1, rank+1, rank+1]
+#variable = 'magnet_chamfer_gapside'
+#values = np.linspace(0, (ivu18args['period']/2-ivu18args['half_pole_size'][2])/4, size)
+#value = values[rank]
+
+#variable = 'quartermagnet_size_xy'
+#name = variable + '_x'
+#values = np.linspace(ivu18args['half_pole_size'][0], 2*ivu18args['half_pole_size'][0], size)
+#value = [values[rank], ivu18args[variable][1]]
+
+#variable = 'quartermagnet_size_xy'
+#name = variable + '_y'
+#values = np.linspace(ivu18args['half_pole_size'][1], 3*ivu18args['half_pole_size'][1], size)
+#value = [ivu18args[variable][0], values[rank]]
+
+#variable = 'pole_chamfer_shortedge'
+#name = variable + '_2'
+#values = np.linspace(0, 10, size)
+#value = values[rank]
+
+#variable = 'half_pole_size'
+#name = variable + '_z2'
+#values = np.linspace(1, 5, size)
+#value = [ivu18args[variable][0], ivu18args[variable][1], values[rank]]
+
+variable = 'pole_offset_y'
+values = np.linspace(0, 5, size)
+value = values[rank]
 
 if name is None:
     name = variable
