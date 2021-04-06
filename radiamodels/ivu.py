@@ -25,7 +25,7 @@ def get_quartermagnet (
         size,
         strength,
         divisions,
-        0, #module do later
+        module, #module do later
         material,
         color
     )
@@ -102,15 +102,14 @@ def get_halfpole (
         rad.TrfOrnt(pole_tip,  rad.TrfTrsl([0, offset_y, 0]))
 
         if module != 0:
-            return rad.ObjAddToCnt(module, [pole_body, pole_tip])
-        else:
-            return rad.ObjCnt([pole_body, pole_tip])
+            rad.ObjAddToCnt(module, [pole_body, pole_tip])
+        return rad.ObjCnt([pole_body, pole_tip])
 
     # Shift for offset_y
     rad.TrfOrnt(pole, rad.TrfTrsl([0, offset_y, 0]))
 
     if module != 0:
-        return rad.ObjAddToCnt(module, [pole])
+        rad.ObjAddToCnt(module, [pole])
 
     return rad.ObjCnt([pole])
 
