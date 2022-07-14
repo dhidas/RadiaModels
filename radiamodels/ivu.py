@@ -30,6 +30,7 @@ def get_quartermagnet (
         color
     )
     rad.MatApl(magnet, material) # Do I need this?
+    rad.ObjDrwAtr(magnet, color) # I DO need to do this
 
     # corner chamfers
     magnet = rad.ObjCutMag(magnet,  [size[0]-chamfer_corner, 0, 0], [1, -1, 0])[0]
@@ -70,7 +71,6 @@ def get_halfpole (
 
     # Calculate center based on input center_z and pole size
     center = [size[0]/2, size[1]/2, center_z]
-    color = [1, 0, 0]
     divisions = [1, 1, 1]
     pole = rad.ObjFullMag(
         center,
@@ -79,7 +79,7 @@ def get_halfpole (
         divisions,
         0, #module do later
         material,
-        color
+        pole_color
     )
     rad.MatApl(pole, material) # Do I need this?
 
@@ -87,6 +87,7 @@ def get_halfpole (
     pole = rad.ObjCutMag(pole,  [size[0]-chamfer_shortedge, 0, 0], [1, -1, 0])[0]
     pole = rad.ObjCutMag(pole,  [0, 0, center_z + size[2]/2 - chamfer_longedge], [0, -1, +1])[0]
     pole = rad.ObjCutMag(pole,  [0, 0, center_z - size[2]/2 + chamfer_longedge], [0, -1, -1])[0]
+    rad.ObjDrwAtr(pole, pole_color) # I DO need to do this
 
     # If there is a pole tip height defined use it, otherwise just one block
     if tip_height > 0:
@@ -96,6 +97,10 @@ def get_halfpole (
         # Body and tip divisions
         rad.ObjDivMag(pole_body, body_divisions)
         rad.ObjDivMag(pole_tip, tip_divisions)
+
+        # Color#
+        rad.ObjDrwAtr(pole_body, pole_color) # I DO need to do this
+        rad.ObjDrwAtr(pole_tip,  tip_color) # I DO need to do this
 
         # Shift for offset_y
         rad.TrfOrnt(pole_body, rad.TrfTrsl([0, offset_y, 0]))
@@ -238,7 +243,7 @@ def get_ivu (
     end1_quartermagnet_minusz = rad.ObjDpl(end1_quartermagnet_plusz)
     rad.TrfOrnt(end1_quartermagnet_minusz, rad.TrfPlSym([0, 0, 0], [0, 0, 1]))
     end1_module = rad.ObjCnt([end1_quartermagnet_minusz, end1_halfpole, end1_quartermagnet_plusz])
-    rad.TrfOrnt(end1_module, rad.TrfTrsl([0, 0, z_first_module + ((nhalfperiods+0)//2) * period/2]))
+    rad.TrfOrnt(end1_module, rad.TrfTrsl([0, 0, z_first_module + ((nhalfperiods)//2 + 0) * period/2]))
     if nhalfperiods//2 % 2 == 0:
         rad.TrfOrnt(end1_module, rad.TrfInv())
     rad.ObjAddToCnt(girder_tod, [end1_module])
@@ -273,7 +278,7 @@ def get_ivu (
     end2_quartermagnet_minusz = rad.ObjDpl(end2_quartermagnet_plusz)
     rad.TrfOrnt(end2_quartermagnet_minusz, rad.TrfPlSym([0, 0, 0], [0, 0, 1]))
     end2_module = rad.ObjCnt([end2_quartermagnet_minusz, end2_halfpole, end2_quartermagnet_plusz])
-    rad.TrfOrnt(end2_module, rad.TrfTrsl([0, 0, z_first_module + ((nhalfperiods+1)//2) * period/2]))
+    rad.TrfOrnt(end2_module, rad.TrfTrsl([0, 0, z_first_module + ((nhalfperiods)//2 + 1) * period/2]))
     if nhalfperiods//2 % 2 == 1:
         rad.TrfOrnt(end2_module, rad.TrfInv())
     rad.ObjAddToCnt(girder_tod, [end2_module])

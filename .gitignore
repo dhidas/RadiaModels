@@ -1,5 +1,7 @@
-# ignore example images
+# ignore example byproducts
 examples/*png
+examples/*out
+examples/*p
 
 # ignore vim swp files
 .*.swp
