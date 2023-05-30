@@ -2,7 +2,7 @@ import radia as rad
 import numpy as np
 from pkg_resources import resource_stream
 
-def get_beff (Z, By, nperiods, debug=False):
+def get_beff (Z, By, nperiods=None, harmonics=False, debug=False):
     """
     Get the effective bfield based on the input field.  Input data must be correspond to 
     an integer number of periods.
@@ -10,9 +10,9 @@ def get_beff (Z, By, nperiods, debug=False):
     Z : list of z positions
     By: list of vertical field values corresponding to each z in Z
     nperiods: Number of periods present in the data given
+    harmonics: if True return odd harmonics instead of beff
+    debug: if True print debug info
     """
-    period = np.abs(Z[-1] - Z[0]) / nperiods
-    if debug: print('get_beff period', period)
     n = len(By)
     freqs = np.fft.fftfreq(n)
     mask = freqs > 0
@@ -20,11 +20,27 @@ def get_beff (Z, By, nperiods, debug=False):
     fft_vals = np.fft.fft(By)
     fft_theo = 2 * np.abs(fft_vals/n)
 
+    # If nperiods is not specified, just find the fundamental and scale
+    if nperiods is None:
+        nperiods = np.argmax(fft_theo[mask]) + 1
+    if debug: print('nperiods:', nperiods)
+
+    period = np.abs(Z[-1] - Z[0]) / nperiods
+    if debug: print('get_beff period', period)
+
     beff = 0
-    for i in range(0, len(fft_theo[mask])):
-        beff += (fft_theo[mask][i]/(i//nperiods+1))**2
-    beff = np.sqrt(beff)
-    return beff
+    bharmonics = []
+    for i in range(nperiods-1, len(fft_theo[mask])//2, 2*nperiods):
+        h = (i // nperiods) * 2 + 1
+
+        if debug and h < 15: print(i, h, fft_theo[mask][i])
+
+        beff += (fft_theo[mask][i]/h)**2
+        bharmonics.append(fft_theo[mask][i])
+
+    if harmonics:
+        return bharmonics
+    return np.sqrt(beff)
 
 def b2k_mm (b, period):
     """Convert magnetic field to K where period is in mm"""

@@ -2,7 +2,6 @@ import radia as rad
 
 import numpy as np
 
-
 def get_ppmu (
     nhalfperiods=20,
     period=49,
