@@ -2,6 +2,8 @@ import radia as rad
 import radiamodels.util as ru
 import numpy as np
 
+from radiamodels.common import *
+
 def get_quartermagnet (
     size,
     material,
@@ -131,7 +133,7 @@ def get_ivu (
     half_pole_size = [38/2, 21.5, 2.8],
     pole_material = ru.get_magnetic_material_permendur(),
     pole_body_divisions = [3, 3, 3],
-    pole_tip_divisions = [5, [5, 1/6], 5],
+    pole_tip_divisions = [5, [5, 6], 5],
     pole_chamfer_shortedge = 2,
     pole_chamfer_longedge = 1,
     pole_tip_height = 2,
@@ -146,6 +148,7 @@ def get_ivu (
     magnet_chamfer_farside = 0,
     magnet_offset_y = 0,
     air_gap = 0.05,
+    magnet_angle = 0,
 
     end1_pole_height = 15,
     end1_magnet_height = 20,
@@ -187,6 +190,7 @@ def get_ivu (
         chamfer_farside=magnet_chamfer_farside,
         center_z=half_pole_size[2]/2 + quartermagnet_size[2]/2 + air_gap,
         offset_y=magnet_offset_y,
+        strength=[0, np.sin(magnet_angle), np.cos(magnet_angle)],
     )
     quartermagnet_minusz = rad.ObjDpl(quartermagnet_plusz)
     rad.TrfOrnt(quartermagnet_minusz, rad.TrfPlSym([0, 0, 0], [0, 0, 1]))
@@ -239,6 +243,7 @@ def get_ivu (
         chamfer_farside=magnet_chamfer_farside,
         center_z=half_pole_size[2]/2 + quartermagnet_size[2]/2 + air_gap,
         offset_y=magnet_offset_y,
+        strength=[0, np.sin(magnet_angle), np.cos(magnet_angle)],
     )   
     end1_quartermagnet_minusz = rad.ObjDpl(end1_quartermagnet_plusz)
     rad.TrfOrnt(end1_quartermagnet_minusz, rad.TrfPlSym([0, 0, 0], [0, 0, 1]))
@@ -274,6 +279,7 @@ def get_ivu (
         chamfer_farside=magnet_chamfer_farside,
         center_z=half_pole_size[2]/2 + quartermagnet_size[2]/2 + air_gap,
         offset_y=magnet_offset_y,
+        strength=[0, np.sin(magnet_angle), np.cos(magnet_angle)],
     )   
     end2_quartermagnet_minusz = rad.ObjDpl(end2_quartermagnet_plusz)
     rad.TrfOrnt(end2_quartermagnet_minusz, rad.TrfPlSym([0, 0, 0], [0, 0, 1]))
