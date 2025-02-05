@@ -32,7 +32,6 @@ def get_quartermagnet (
         color
     )
     rad.MatApl(magnet, material) # Do I need this?
-    rad.ObjDrwAtr(magnet, color) # I DO need to do this
 
     # corner chamfers
     magnet = rad.ObjCutMag(magnet,  [size[0]-chamfer_corner, 0, 0], [1, -1, 0])[0]
@@ -51,6 +50,8 @@ def get_quartermagnet (
 
     # Shift magnet for offset_y
     rad.TrfOrnt(magnet, rad.TrfTrsl([0, offset_y, 0]))
+
+    rad.ObjDrwAtr(magnet, color) # I DO need to do this
 
     return magnet
 
