@@ -46,12 +46,20 @@ def get_epu (
         [0, +1,  0],
 
     ]
+    magnet_colors = [
+        [0, 1, 1],
+        [1, 0, 1],
+        [0, 1, 1],
+        [0.5, 0, 0.5],
+
+    ]
     magnet_color = [0, 0, 1]
 
     girder_ti = rad.ObjCnt([])
     nmagnets = nhalfperiods * 2 + 1
     for i in range(-2, nmagnets):
         this_magnet_strength = magnet_strengths[i % 4]
+        this_magnet_color = magnet_colors[i % 4]
         this_magnet_center = [0, 0, -length / 2 + end_outer_length + end_inner_length + i * magnet_size[2] + magnet_size[2] / 2]
         this_magnet_size = magnet_size
         if i == -2:
@@ -78,7 +86,7 @@ def get_epu (
             magnet_divisions,
             girder_ti,
             magnet_material,
-            magnet_color
+            this_magnet_color,
         )
 
     # Move ti

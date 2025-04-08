@@ -5,6 +5,7 @@ from pkg_resources import resource_stream
 import panel as pn
 import vtk
 import numpy as np
+from scipy.optimize import curve_fit
 
 pn.extension('vtk')  # Enable VTK support in Panel
 
@@ -218,6 +219,38 @@ def draw_radia_vtk(
     return pn.Column(vtk_pane)
 
 
+
+
+def get_beff_bn (Z, B, period, nh=7, debug=False):
+    """
+    Get the effective field and field components by a simple fit to sin of odd harmonics
+    
+    args:
+        Z: list of z-positions
+        B: [bx, by, bz] at each z-position
+        period: period in mm
+        nh: number of odd harmonics to consider
+    returns:
+        [beff, [b1, b3, b5, ...]]
+    """
+    def harm(z, *p):
+        z = np.asarray(z)
+        result = np.zeros_like(z, dtype=float)
+        for i in range(len(p)):
+            h = 2 * i + 1
+            result += -p[i] * np.sin(h * 2 * np.pi * z / period)
+        return result
+
+    popt, pcov = curve_fit(harm, Z, [b[1] for b in B], p0=[1]*nh)
+
+    if debug:
+        for i, p in enumerate(popt):
+            h = 2 * i + 1
+            print(f'{h:2d} {p:9.5f}')
+    beff = float(np.sqrt(sum([(popt[i]/(2*i+1))**2 for i in range(len(popt))])))
+    
+    return [beff, popt.tolist()]
+
 def get_beff (Z, By, nperiods=None, harmonics=False, debug=False):
     """
     Get the effective bfield based on the input field.  Input data must be correspond to 
@@ -247,7 +280,7 @@ def get_beff (Z, By, nperiods=None, harmonics=False, debug=False):
     beff = 0
     bharmonics = []
     for i in range(nperiods-1, len(fft_theo[mask])//2, 2*nperiods):
-        h = (i // nperiods) * 2 + 1
+        h = (i // nperiods) + 1
 
         if debug and h < 15: print(i, h, fft_theo[mask][i])
 
@@ -285,4 +318,41 @@ def get_magnetic_material (filename):
     radHMP = [[x[0], x[1]] for x in zip(radHP, radMP)]
     return rad.MatSatIsoTab(radHMP)
 
+
+def write_params_to_file (p, fn):
+    """
+    write parameters from a dict to a file for keeping track of things
+
+    p - dict of parameters
+    fn - filename
+
+    returns nothing
+    """
+
+    with open(fn, 'w') as fo:
+        fo.write('dict({\n')
+        for k, v in p.items():
+            k = "'" + k + "'"
+            fo.write(f'    {k:35s}: {v},\n')
+        fo.write('})\n')
+    return
+
+
+def write_field_to_file (z, b, fn):
+    """
+    write field to a file.  the field will be a function of z and have bx by bz (OSCARS 1D)
+
+    z - list or array of z points
+    b - list or array of [bx, by, bz] corresponding to the z points
+
+    returns nothing
+    """
+
+    if len(z) != len(b):
+        raise ValueError('length of z and b are not the same')
+
+    with open(fn, 'w') as fo:
+        for i in range(len(z)):
+            fo.write(f'{z[i]:+.3e} {b[i][0]:+.3e} {b[i][1]:+.3e} {b[i][2]:+.3e}\n')
+    return
 
